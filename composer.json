@@ -1,0 +1,40 @@
+{
+  "name": "webarchitect609/monitor",
+  "description": "Super-lightweight monitoring via HTTP-request.",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Sergey Gripinskiy",
+      "email": "web-architect@mail.ru",
+      "role": "Creator"
+    }
+  ],
+  "require": {
+    "php": "^7.2",
+    "ext-mysqli": "*",
+    "guzzlehttp/guzzle": "^6.5"
+  },
+  "require-dev": {
+    "friendsofphp/php-cs-fixer": "^2.16"
+  },
+  "autoload": {
+    "psr-4": {
+      "WebArch\\Monitor\\": "src/main"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "WebArch\\Monitor\\Test\\": "src/test"
+    }
+  },
+  "config": {
+    "sort-packages": true
+  },
+  "conflict": {
+    "webarchitect609/bitrix-monitor": "^1.0"
+  },
+  "suggest": {
+    "webarchitect609/bitrix-monitor": "Bitrix monitoring via HTTP-request."
+  }
+}
