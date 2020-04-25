@@ -20,9 +20,6 @@ use WebArch\Monitor\Exception\TokenIsNotConfiguredException;
 use WebArch\Monitor\Metric\DummyMySQLiMetric;
 use WebArch\Monitor\Service\MonitorBase;
 use WebArch\Monitor\Service\MySQLiAwareMonitor;
-use function PHPUnit\Framework\assertArrayHasKey;
-use function PHPUnit\Framework\assertNull;
-use function PHPUnit\Framework\assertSame;
 
 class MySQLiAwareMonitorTest extends TestCase
 {
@@ -124,7 +121,7 @@ class MySQLiAwareMonitorTest extends TestCase
 
     public function testSetIntervalGetInterval()
     {
-        assertSame(
+        $this->assertSame(
             $this->interval,
             $this->monitor->getInterval()
         );
@@ -132,24 +129,25 @@ class MySQLiAwareMonitorTest extends TestCase
 
     public function testSetTimeZoneGetTimeZone()
     {
-        assertSame(
+        $this->assertSame(
             $this->timeZone,
             $this->monitor->getTimeZone()
         );
         $this->monitor->setTimeZone(null);
-        assertNull($this->monitor->getTimeZone());
+        $this->assertNull($this->monitor->getTimeZone());
     }
 
     /**
      * @throws ReflectionException
+     * @throws Exception
      */
     public function testAddMetric()
     {
         $metricsProperty = new ReflectionProperty($this->monitor, 'metrics');
         $metricsProperty->setAccessible(true);
         $metrics = $metricsProperty->getValue($this->monitor);
-        assertArrayHasKey($this->metricName, $metrics);
-        assertSame($this->metric, $metrics[$this->metricName]);
+        $this->assertArrayHasKey($this->metricName, $metrics);
+        $this->assertSame($this->metric, $metrics[$this->metricName]);
     }
 
     public function testAddMetricFails()
@@ -161,7 +159,7 @@ class MySQLiAwareMonitorTest extends TestCase
 
     public function testEvalMetricByName()
     {
-        assertSame(
+        $this->assertSame(
             $this->mockCalcValue,
             $this->monitor->evalMetricByName($this->metricName)
         );
@@ -179,7 +177,7 @@ class MySQLiAwareMonitorTest extends TestCase
      */
     public function testExec()
     {
-        assertSame(
+        $this->assertSame(
             $this->mockCalcValue,
             $this->monitor->exec($this->metricName)
         );
