@@ -3,10 +3,12 @@
 namespace WebArch\Monitor\Service;
 
 use DateInterval;
-use InvalidArgumentException;
+use DateTimeZone;
 use Throwable;
-use WebArch\Monitor\Enum\ErrorCode;
-use WebArch\Monitor\Exception\MetricNotFoundException;
+use WebArch\Monitor\Exception\InvalidArgumentException;
+use WebArch\Monitor\Exception\InvalidTokenException;
+use WebArch\Monitor\Exception\MetricIsNotFoundException;
+use WebArch\Monitor\Exception\TokenIsNotConfiguredException;
 use WebArch\Monitor\Metric\Interfaces\MetricInterface;
 use WebArch\Monitor\Service\Interfaces\MonitorInterface;
 
@@ -27,6 +29,11 @@ abstract class MonitorBase implements MonitorInterface
      */
     protected $interval;
 
+    /**
+     * @var null|DateTimeZone
+     */
+    protected $timeZone;
+
     public function __construct(string $token)
     {
         $this->checkToken($token);
@@ -42,17 +49,23 @@ abstract class MonitorBase implements MonitorInterface
      */
     abstract protected function doConfigureMetric(MetricInterface $metric): MetricInterface;
 
+    /**
+     * @param string $token
+     *
+     * @throws TokenIsNotConfiguredException
+     * @throws InvalidTokenException
+     */
     protected function checkToken(string $token)
     {
         $token = trim($token);
         if ('' === $token) {
             header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
-            exit(ErrorCode::TOKEN_IS_NOT_CONFIGURED);
+            throw new TokenIsNotConfiguredException();
         }
 
         if ($_SERVER[self::TOKEN_HEADER_KEY] !== $token) {
             header($_SERVER['SERVER_PROTOCOL'] . ' 401 Unauthorized', true, 401);
-            exit(ErrorCode::TOKEN_IS_NOT_VALID);
+            throw new InvalidTokenException();
         }
     }
 
@@ -70,6 +83,26 @@ abstract class MonitorBase implements MonitorInterface
     public function setInterval(DateInterval $interval)
     {
         $this->interval = $interval;
+
+        return $this;
+    }
+
+    /**
+     * @return null|DateTimeZone
+     */
+    public function getTimeZone(): ?DateTimeZone
+    {
+        return $this->timeZone;
+    }
+
+    /**
+     * @param null|DateTimeZone $timeZone
+     *
+     * @return $this
+     */
+    public function setTimeZone(?DateTimeZone $timeZone)
+    {
+        $this->timeZone = $timeZone;
 
         return $this;
     }
@@ -98,42 +131,29 @@ abstract class MonitorBase implements MonitorInterface
     public function evalMetricByName(string $metricName)
     {
         if (!array_key_exists($metricName, $this->metrics)) {
-            throw new MetricNotFoundException($metricName);
+            throw new MetricIsNotFoundException($metricName);
         }
 
         return $this->doConfigureMetric($this->metrics[$metricName])
-                    ->calculate($this->getInterval());
+                    ->calculate($this->getInterval(), $this->getTimeZone());
     }
 
+    /**
+     * @inheritDoc
+     */
     public function exec(string $metricName): string
     {
         /**
          * It's safe to return the exception description here, because the Token has been checked.
          */
         try {
-
             return $this->evalMetricByName($metricName);
-        } catch (MetricNotFoundException $exception) {
+        } catch (MetricIsNotFoundException $exception) {
             header($_SERVER['SERVER_PROTOCOL'] . ' 400 Bad Request', true, 400);
-
-            return $this->getExceptionDescription($exception);
+            throw $exception;
         } catch (Throwable $exception) {
             header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
-
-            return $this->getExceptionDescription($exception);
+            throw $exception;
         }
-    }
-
-    private function getExceptionDescription(Throwable $exception): string
-    {
-        return sprintf(
-            "[%s] %s (%s) in %s:%s\n%s\n",
-            get_class($exception),
-            $exception->getMessage(),
-            $exception->getCode(),
-            $exception->getFile(),
-            $exception->getLine(),
-            $exception->getTraceAsString()
-        );
     }
 }

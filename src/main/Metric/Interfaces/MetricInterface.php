@@ -3,6 +3,7 @@
 namespace WebArch\Monitor\Metric\Interfaces;
 
 use DateInterval;
+use DateTimeZone;
 
 interface MetricInterface
 {
@@ -20,8 +21,9 @@ interface MetricInterface
 
     /**
      * @param DateInterval $interval
+     * @param null|DateTimeZone $timeZone
      *
      * @return mixed
      */
-    public function calculate(DateInterval $interval);
+    public function calculate(DateInterval $interval, DateTimeZone $timeZone = null);
 }

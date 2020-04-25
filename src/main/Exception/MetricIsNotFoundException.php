@@ -6,7 +6,7 @@ use RuntimeException;
 use Throwable;
 use WebArch\Monitor\Enum\ErrorCode;
 
-class MetricNotFoundException extends RuntimeException
+class MetricIsNotFoundException extends RuntimeException
 {
     public function __construct(string $metricName, Throwable $previous = null)
     {

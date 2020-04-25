@@ -3,15 +3,19 @@
 namespace WebArch\Monitor\Service\Interfaces;
 
 use DateInterval;
-use WebArch\Monitor\Exception\MetricNotFoundException;
+use DateTimeZone;
+use Throwable;
+use WebArch\Monitor\Exception\InvalidArgumentException;
+use WebArch\Monitor\Exception\MetricIsNotFoundException;
 use WebArch\Monitor\Metric\Interfaces\MetricInterface;
 
 interface MonitorInterface
 {
 
     /**
-     * @param \WebArch\Monitor\Metric\Interfaces\MetricInterface $metric
+     * @param MetricInterface $metric
      *
+     * @throws InvalidArgumentException
      * @return $this
      */
     public function addMetric(MetricInterface $metric);
@@ -29,9 +33,21 @@ interface MonitorInterface
     public function getInterval(): DateInterval;
 
     /**
+     * @param null|DateTimeZone $timeZone
+     *
+     * @return $this
+     */
+    public function setTimeZone(?DateTimeZone $timeZone);
+
+    /**
+     * @return null|DateTimeZone
+     */
+    public function getTimeZone(): ?DateTimeZone;
+
+    /**
      * @param string $metricName
      *
-     * @throws MetricNotFoundException
+     * @throws MetricIsNotFoundException
      * @return mixed
      */
     public function evalMetricByName(string $metricName);
@@ -39,6 +55,8 @@ interface MonitorInterface
     /**
      * @param string $metricName
      *
+     * @throws MetricIsNotFoundException
+     * @throws Throwable
      * @return string
      */
     public function exec(string $metricName): string;

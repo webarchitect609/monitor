@@ -3,6 +3,8 @@ Super-lightweight monitoring via HTTP-request.
 
 **Be careful! This is non-stable alpha version so far!**
 
+[![Build Status](https://travis-ci.org/webarchitect609/monitor.svg?branch=master)](https://travis-ci.org/webarchitect609/monitor)
+
 The library enables to monitor different metrics via HTTP-request using token in X-Monitor-Token header. 
 
 How to use:

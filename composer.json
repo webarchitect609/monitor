@@ -16,7 +16,8 @@
     "guzzlehttp/guzzle": "^6.5"
   },
   "require-dev": {
-    "friendsofphp/php-cs-fixer": "^2.16"
+    "friendsofphp/php-cs-fixer": "^2.16",
+    "phpunit/phpunit": "^9.1"
   },
   "autoload": {
     "psr-4": {
@@ -27,6 +28,10 @@
     "psr-4": {
       "WebArch\\Monitor\\Test\\": "src/test"
     }
+  },
+  "scripts": {
+    "test": "vendor/bin/phpunit",
+    "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
   },
   "config": {
     "sort-packages": true
