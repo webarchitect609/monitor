@@ -73,7 +73,7 @@ class MySQLiAwareMonitorTest extends TestCase
          * Suppress warning "Cannot modify header information - headers already sent by"
          * and notice "Undefined index"
          */
-        $this->iniSet('error_reporting', ini_get('error_reporting') & ~E_WARNING & ~E_NOTICE);
+        ini_set('error_reporting', ini_get('error_reporting') & ~E_WARNING & ~E_NOTICE);
         $this->token = bin2hex(random_bytes(32));
         $_SERVER['SERVER_PROTOCOL'] = 'HTTP/1.1';
         $_SERVER[MonitorBase::TOKEN_HEADER_KEY] = $this->token;
@@ -94,7 +94,7 @@ class MySQLiAwareMonitorTest extends TestCase
                                                                               ->addMetric($this->metric);
     }
 
-    public function testCreation()
+    public function testCreation(): void
     {
         $_SERVER[MonitorBase::TOKEN_HEADER_KEY] = $this->token;
         $this->expectOutputString('');
@@ -104,7 +104,7 @@ class MySQLiAwareMonitorTest extends TestCase
         );
     }
 
-    public function testInvalidToken()
+    public function testInvalidToken(): void
     {
         $_SERVER[MonitorBase::TOKEN_HEADER_KEY] = $this->token . 'shall fail!';
         $this->expectException(InvalidTokenException::class);
@@ -112,14 +112,14 @@ class MySQLiAwareMonitorTest extends TestCase
         new MySQLiAwareMonitor($this->token, $this->mysqli);
     }
 
-    public function testCheckEmptyToken()
+    public function testCheckEmptyToken(): void
     {
         $this->expectException(TokenIsNotConfiguredException::class);
         $this->expectExceptionCode(ErrorCode::TOKEN_IS_NOT_CONFIGURED);
         new MySQLiAwareMonitor('', $this->mysqli);
     }
 
-    public function testSetIntervalGetInterval()
+    public function testSetIntervalGetInterval(): void
     {
         $this->assertSame(
             $this->interval,
@@ -127,7 +127,7 @@ class MySQLiAwareMonitorTest extends TestCase
         );
     }
 
-    public function testSetTimeZoneGetTimeZone()
+    public function testSetTimeZoneGetTimeZone(): void
     {
         $this->assertSame(
             $this->timeZone,
@@ -141,7 +141,7 @@ class MySQLiAwareMonitorTest extends TestCase
      * @throws ReflectionException
      * @throws Exception
      */
-    public function testAddMetric()
+    public function testAddMetric(): void
     {
         $metricsProperty = new ReflectionProperty($this->monitor, 'metrics');
         $metricsProperty->setAccessible(true);
@@ -150,14 +150,14 @@ class MySQLiAwareMonitorTest extends TestCase
         $this->assertSame($this->metric, $metrics[$this->metricName]);
     }
 
-    public function testAddMetricFails()
+    public function testAddMetricFails(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionCode(ErrorCode::OTHER_ERROR);
         $this->monitor->addMetric($this->metric);
     }
 
-    public function testEvalMetricByName()
+    public function testEvalMetricByName(): void
     {
         $this->assertSame(
             $this->mockCalcValue,
@@ -165,7 +165,7 @@ class MySQLiAwareMonitorTest extends TestCase
         );
     }
 
-    public function testEvalMetricByNameFails()
+    public function testEvalMetricByNameFails(): void
     {
         $this->expectException(MetricIsNotFoundException::class);
         $this->expectExceptionCode(ErrorCode::METRIC_IS_NOT_FOUND);
@@ -175,7 +175,7 @@ class MySQLiAwareMonitorTest extends TestCase
     /**
      * @throws Throwable
      */
-    public function testExec()
+    public function testExec(): void
     {
         $this->assertSame(
             $this->mockCalcValue,
@@ -186,7 +186,7 @@ class MySQLiAwareMonitorTest extends TestCase
     /**
      * @throws Throwable
      */
-    public function testExecFails()
+    public function testExecFails(): void
     {
         $this->expectException(MetricIsNotFoundException::class);
         $this->expectExceptionCode(ErrorCode::METRIC_IS_NOT_FOUND);
@@ -196,7 +196,7 @@ class MySQLiAwareMonitorTest extends TestCase
     /**
      * @throws Throwable
      */
-    public function testExecFailsFromMetricsException()
+    public function testExecFailsFromMetricsException(): void
     {
         $metricName = 'exception-metrics';
         /** @var DummyMySQLiMetric|MockObject $metric */
